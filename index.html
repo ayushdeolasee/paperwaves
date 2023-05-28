@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>XML to JSON Conversion</title>
+        <script>
+            function convertXMLtoJSON() {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var xmlData = xhr.responseXML;
+                        var jsonData = xmlToJson(xmlData);
+                        console.log(jsonData);
+                    }
+                };
+                xhr.open(
+                    "GET",
+                    "http://export.arxiv.org/api/query?search_query=all:electron&start=0&max_results=1",
+                    true
+                );
+                xhr.send();
+            }
+
+            function xmlToJson(xml) {
+                var obj = {};
+                if (xml.nodeType === 1) {
+                    if (xml.attributes.length > 0) {
+                        obj["@attributes"] = {};
+                        for (var j = 0; j < xml.attributes.length; j++) {
+                            var attribute = xml.attributes.item(j);
+                            obj["@attributes"][attribute.nodeName] =
+                                attribute.nodeValue;
+                        }
+                    }
+                } else if (xml.nodeType === 3) {
+                    obj = xml.nodeValue;
+                }
+                if (xml.hasChildNodes()) {
+                    for (var i = 0; i < xml.childNodes.length; i++) {
+                        var item = xml.childNodes.item(i);
+                        var nodeName = item.nodeName;
+                        if (typeof obj[nodeName] === "undefined") {
+                            obj[nodeName] = xmlToJson(item);
+                        } else {
+                            if (typeof obj[nodeName].push === "undefined") {
+                                var old = obj[nodeName];
+                                obj[nodeName] = [];
+                                obj[nodeName].push(old);
+                            }
+                            obj[nodeName].push(xmlToJson(item));
+                        }
+                    }
+                }
+                return obj;
+            }
+        </script>
+    </head>
+    <body>
+        <button onclick="convertXMLtoJSON()">Convert XML to JSON</button>
+    </body>
+</html>

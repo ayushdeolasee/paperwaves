@@ -6,7 +6,9 @@
                 Ride the Crest of Knowledge with PaperWaves!
             </p>
             <div class="container">
-                <button class="button">Read Now</button>
+                <button class="button">
+                    <NuxtLink to="/home">Read Now</NuxtLink>
+                </button>
             </div>
         </div>
         <svg
@@ -69,7 +71,12 @@
     /* position: absolute; */
     /* top: 20%; */
     height: fit-content;
+    /* position: relative; */
+    /* display: flex; */
+    /* justify-content: center; */
     position: relative;
+    top: 50%;
+
     top: 200px;
 }
 
@@ -85,6 +92,7 @@
     outline: none;
     border: none;
     background-color: #20b2ab;
+    text-decoration: none;
     font-size: 17px;
     color: white;
     width: 200px;
@@ -100,10 +108,6 @@
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
-body {
-    margin: none;
-    padding: none;
-}
 .container {
     width: 100vw;
     display: flex;
@@ -142,7 +146,9 @@ body {
     margin: none;
     padding: none;
     width: 100vw;
-    top: 31.6vw;
+    top: 12.55vw;
+    /* display: flex; */
+    /* justify-content: bottom; */
     left: 0;
 }
 </style>
