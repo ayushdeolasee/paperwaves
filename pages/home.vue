@@ -7,17 +7,14 @@
         <div class="cards">
             <div class="card1">
                 <h1 class="cardTitle">
-                    New Insights on the Stokes Paradox for Flow in Unbounded
-                    Domain
+                    {{ title }}
                 </h1>
                 <p>
-                    <span class="keyWords">Authors:</span> Ingeborg G. Gjerde,
-                    Ridgway Scott
+                    <span class="keyWords">Authors:</span>
+                    {{ author }}
                 </p>
-                <p><span class="keyWords">Subject:</span> Fluid Dynamics</p>
-                <p>
-                    <span class="keyWords">Published:</span> 30th December 2022
-                </p>
+                <p><span class="keyWords">Subject: </span>{{ subject }}</p>
+                <p><span class="keyWords">Published:</span> {{ published }}</p>
             </div>
         </div>
     </div>
@@ -28,13 +25,33 @@ export default {
     data() {
         return {
             message: "",
+            title: "",
+            summary: "",
+            author: "",
+            published: "",
+            subject: "",
         };
     },
-    // mounted() {
-    //     fetch(
-    //         "http://export.arxiv.org/api/query?search_query=all:electron"
-    //     ).then((data) => );
-    // },
+    mounted() {
+        fetch("http://127.0.0.1:8000")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log(data["Authors"]);
+                this.title = data["Title"];
+                this.summary = data["Summary"];
+                this.author = data["Authors"];
+                this.published = data["Published"];
+                this.subject = data["Primary_category"];
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    },
 };
 </script>
 

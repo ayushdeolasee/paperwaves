@@ -29,9 +29,36 @@
             instability, meaning that flow instability steadily increases with
             domain size. We refer to this as an instability paradox.
         </p>
-        <NuxtLink><button class="button">Read Now</button> </NuxtLink>
+        <NuxtLink to={{ pdf }}
+            ><button class="button">Read Now</button>
+        </NuxtLink>
     </div>
 </template>
+
+<script>
+export default {
+    data() {
+        return {
+            pdf: "",
+        };
+    },
+    mounted() {
+        fetch("http://127.0.0.1:8000")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then((data) => {
+                this.pdf = data["PDF_URL"];
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    },
+};
+</script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
