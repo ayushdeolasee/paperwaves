@@ -22,23 +22,48 @@
 
 import arxiv
 import json 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-search = arxiv.Search(
-  query = "quantum",
-  max_results = 10,
-  sort_by = arxiv.SortCriterion.SubmittedDate
+app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:5501",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-for result in search.results():
-#   document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
-  document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Primary_category": ""}
-  document['Title'] = str(result.title)
-  document['Summary'] = str(result.summary)
-  document['Entry_id'] = str(result.entry_id)
-  document['PDF_URL'] = str(result.pdf_url)
-#   document['Published'] = str(result.published)
-#   document['Authors'] = str(result.authors)
-  document['Primary_category'] = str(result.primary_category)
-#   print(str(result.authors))
-  json = json.dumps(document)
-  print(json)
+
+@app.get("/")
+async def root():
+    search = arxiv.Search(
+    query = "quantum",
+    max_results = 1,
+    sort_by = arxiv.SortCriterion.SubmittedDate
+    )
+
+    for result in search.results():
+        document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
+    #   document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Primary_category": ""}
+        summary = str(result.summary)
+        summary2 = summary.replace("\n", " ")
+        document['Title'] = str(result.title)
+        # document['Summary'] = str(result.summary)
+        document['Summary'] = summary2
+        document['Entry_id'] = str(result.entry_id)
+        document['PDF_URL'] = str(result.pdf_url)
+        document['Published'] = str(result.published)
+        document['Authors'] = str(result.authors[1])
+        document['Primary_category'] = str(result.primary_category)
+        # print(document)
+    #   print(str(result.authors))
+        json_document = json.dumps(document)
+        # return json_document
+        return document
