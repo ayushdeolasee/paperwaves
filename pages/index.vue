@@ -6,9 +6,9 @@
                 Ride the Crest of Knowledge with PaperWaves!
             </p>
             <div class="container">
-                <button class="button">
-                    <NuxtLink to="/home">Read Now</NuxtLink>
-                </button>
+                <NuxtLink to="/home">
+                    <button class="button">Read Now</button>
+                </NuxtLink>
             </div>
         </div>
         <svg
@@ -84,7 +84,7 @@
     width: 100%;
     height: 100%;
 }
-.button {
+.link {
     /* position: relative; */
     /* left: 50%; */
     position: absolute;
@@ -101,6 +101,23 @@
     transition-property: box-shadow;
     transition-timing-function: linear;
     margin-top: 50px;
+}
+
+.button {
+    /* position: relative; */
+    /* left: 50%; */
+    /* left: 50%; */
+    outline: none;
+    border: none;
+    background-color: #20b2ab;
+    text-decoration: none;
+    font-size: 17px;
+    color: white;
+    width: 200px;
+    height: 50px;
+    border-radius: 15px;
+    transition-property: box-shadow;
+    transition-timing-function: linear;
 }
 
 .button:hover {
@@ -142,13 +159,10 @@
 }
 
 .wave {
-    position: relative;
+    position: absolute;
+    bottom: 0;
     margin: none;
     padding: none;
     width: 100vw;
-    top: 12.55vw;
-    /* display: flex; */
-    /* justify-content: bottom; */
-    left: 0;
 }
 </style>
