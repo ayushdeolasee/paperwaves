@@ -5,17 +5,8 @@
             <input class="input" v-model="message" placeholder="Search" />
         </div>
         <div class="cards">
-            <div class="card1">
-                <h1 class="cardTitle">
-                    {{ title }}
-                </h1>
-                <p>
-                    <span class="keyWords">Authors:</span>
-                    {{ author }}
-                </p>
-                <p><span class="keyWords">Subject: </span>{{ subject }}</p>
-                <p><span class="keyWords">Published:</span> {{ published }}</p>
-            </div>
+            <card :information="p" />
+            
         </div>
     </div>
 </template>
@@ -57,8 +48,15 @@ export default {
 </script> -->
 
 <script setup>
-const title = ref < string > "";
-fetch("http://127.0.0.1:8000")
+let title = "";
+let summary = "";
+let author = "";
+let published = "";
+let subject = "";
+var datetime = new Date();
+var date;
+
+await fetch("http://127.0.0.1:8000")
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -66,12 +64,16 @@ fetch("http://127.0.0.1:8000")
         return response.json();
     })
     .then((data) => {
-        const title = data["Title"];
-        const summary = data["Summary"];
-        const author = data["Authors"];
-        const published = data["Published"];
-        const subject = data["Primary_category"];
-        console.log(this.subject);
+        title = data["Title"];
+        summary = data["Summary"];
+        author = data["Authors"];
+        published = data["Published"];
+        subject = data["Primary_category"];
+        console.log(published);
+        datetime = new Date(published);
+        date = datetime.toDateString();
+        date = date.replace(" ", ", ");
+        console.log(title);
     })
     .catch((error) => {
         console.error("Error:", error);

@@ -29,7 +29,7 @@
             instability, meaning that flow instability steadily increases with
             domain size. We refer to this as an instability paradox.
         </p>
-        <NuxtLink to={{ pdf }}
+        <NuxtLink :to="pdf"
             ><button class="button">Read Now</button>
         </NuxtLink>
     </div>
