@@ -62,10 +62,12 @@ async def root():
         document['Entry_id'] = str(result.entry_id)
         document['PDF_URL'] = str(result.pdf_url)
         document['Published'] = str(result.published)
-        document['Authors'] = str(result.authors[1])
+        document['Authors'] = str(result.authors[0])
         document['Primary_category'] = str(result.primary_category)
         # print(document)
     #   print(str(result.authors))
+        print(result.primary_category)
+        print(result.primary_category)
         json_document = json.dumps(document)
         # return json_document
         return document

@@ -20,7 +20,7 @@
     </div>
 </template>
 
-<script>
+<!-- <script>
 export default {
     data() {
         return {
@@ -30,6 +30,7 @@ export default {
             author: "",
             published: "",
             subject: "",
+            date: "",
         };
     },
     mounted() {
@@ -41,18 +42,40 @@ export default {
                 return response.json();
             })
             .then((data) => {
-                console.log(data["Authors"]);
                 this.title = data["Title"];
                 this.summary = data["Summary"];
                 this.author = data["Authors"];
                 this.published = data["Published"];
                 this.subject = data["Primary_category"];
+                console.log(this.subject);
             })
             .catch((error) => {
                 console.error("Error:", error);
             });
     },
 };
+</script> -->
+
+<script setup>
+const title = ref < string > "";
+fetch("http://127.0.0.1:8000")
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then((data) => {
+        const title = data["Title"];
+        const summary = data["Summary"];
+        const author = data["Authors"];
+        const published = data["Published"];
+        const subject = data["Primary_category"];
+        console.log(this.subject);
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
 </script>
 
 <style scoped>
