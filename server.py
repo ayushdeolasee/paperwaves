@@ -25,11 +25,12 @@ app.add_middleware(
 async def root():
     search = arxiv.Search(
     query = "quantum",
-    max_results = 1,
+    max_results = 10,
     sort_by = arxiv.SortCriterion.SubmittedDate
     )
-
+    
     for result in search.results():
+        print(result)
         document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
         summary = str(result.summary)
         summary2 = summary.replace("\n", " ")
@@ -40,7 +41,5 @@ async def root():
         document['Published'] = str(result.published)
         document['Authors'] = str(result.authors[0])
         document['Primary_category'] = str(result.primary_category)
-
-        print(result.primary_category)
-        print(result.primary_category)
+        # print(document)
         return document

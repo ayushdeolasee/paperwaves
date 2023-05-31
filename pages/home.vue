@@ -4,9 +4,14 @@
             <img class="icon" src="/find.svg" />
             <input class="input" v-model="message" placeholder="Search" />
         </div>
-        <div class="cards">
-            <card :information="p" />
-            
+        <div v-for="i in finalData" class="cards">
+            <!-- <card
+                :title="title"
+                :author="author"
+                :published="date"
+                :subject="subject"
+            /> -->
+            <card :information="i"/>
         </div>
     </div>
 </template>
@@ -55,6 +60,7 @@ let published = "";
 let subject = "";
 var datetime = new Date();
 var date;
+let finalData;
 
 await fetch("http://127.0.0.1:8000")
     .then((response) => {
@@ -64,16 +70,18 @@ await fetch("http://127.0.0.1:8000")
         return response.json();
     })
     .then((data) => {
+        finalData = data;
         title = data["Title"];
         summary = data["Summary"];
         author = data["Authors"];
         published = data["Published"];
         subject = data["Primary_category"];
-        console.log(published);
+        // console.log(published);
         datetime = new Date(published);
         date = datetime.toDateString();
         date = date.replace(" ", ", ");
-        console.log(title);
+        // console.log(title);
+        // console.log(finalData);
     })
     .catch((error) => {
         console.error("Error:", error);

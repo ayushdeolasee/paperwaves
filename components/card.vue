@@ -1,19 +1,39 @@
 <template>
     <div class="card">
         <h1 class="cardTitle">
-            {{ information.title }}
+            {{ title }}
         </h1>
         <p>
             <span class="keyWords">Authors:</span>
-            {{ information.author }}
+            {{ author }}
         </p>
-        <p><span class="keyWords">Subject: </span>{{ information.subject }}</p>
-        <p><span class="keyWords">Published:</span> {{ information.date }}</p>
+        <p><span class="keyWords">Subject: </span>{{ subject }}</p>
+        <p><span class="keyWords">Published:</span> {{ published }}</p>
     </div>
 </template>
 
 <script setup>
+// const { title, author, published, subject } = defineProps([
+//     "title",
+//     "author",
+//     "published",
+//     "subject",
+// ]);
 const { information } = defineProps(["information"]);
+let title = "";
+let author = "";
+let published = "";
+let subject = "";
+var datetime = new Date();
+var date;
+console.log(information);
+// title = information["Title"];
+// author = information["Authors"];
+// published = information["Published"];
+// subject = information["Primary_category"];
+// datetime = new Date(published);
+// date = datetime.toDateString();
+// date = date.replace(" ", ", ");
 </script>
 
 <style scoped>
