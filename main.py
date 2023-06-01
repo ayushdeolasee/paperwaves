@@ -23,6 +23,5 @@ for result in search.results():
     # print(document)
 #   print(str(result.authors))
     # json_document = json.dumps(document)
-    finalDocument = finalDocument | document
     # print(document)
-print(finalDocument)
+    print(document)
