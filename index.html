@@ -13,7 +13,10 @@
                     return response.json();
                 })
                 .then((data) => {
-                    console.log(data["Authors"]);
+                    //for (i in data) {
+                    //    console.log(data[i]);
+                    //}
+                    console.log(data[0]["Authors"]);
                 })
                 .catch((error) => {
                     console.error("Error:", error);

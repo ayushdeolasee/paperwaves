@@ -27,9 +27,9 @@ async def root():
     query = "quantum",
     max_results = 10,
     sort_by = arxiv.SortCriterion.SubmittedDate)
-
+    finalDocument = []
     for result in search.results():
-        finalDocument = {}
+        authors = []
         document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
 #       document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Primary_category": ""}
         summary = str(result.summary)
@@ -40,11 +40,20 @@ async def root():
         document['Entry_id'] = str(result.entry_id)
         document['PDF_URL'] = str(result.pdf_url)
         document['Published'] = str(result.published)
-        document['Authors'] = str(result.authors[0])
+        i = 0
+        while True:
+            if i == len(result.authors):
+                break
+            authors.append(str(result.authors[i]))
+            i += 1
+            
+        document['Authors'] = authors
+        # document['Authors'] = str(result.authors[0])
         document['Primary_category'] = str(result.primary_category)
         # print(document)
 #       print(str(result.authors))
         json_document = json.dumps(document)
         # print(document)
+        finalDocument.append(document)
         print(document) 
-        return document 
+    return finalDocument 

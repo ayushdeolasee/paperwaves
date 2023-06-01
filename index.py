@@ -1,15 +1,27 @@
-import arxiv
-import logging
+import arxivscraper
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-logging.basicConfig(level=logging.INFO)
-paper = next(arxiv.Search(id_list=["1605.08386v1"]).results())
+app = FastAPI()
 
-big_slow_client = arxiv.Client(
-  page_size = 10,
-  delay_seconds = 10,
-  num_retries = 1
+origins = [
+    "http://localhost",
+    "http://localhost:5501",
+    "http://127.0.0.1:5501",
+    "http://localhost:3000"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Prints 1000 titles before needing to make another request.
-for result in big_slow_client.results(arxiv.Search(query="quantum")):
-  print(result.title)
+
+@app.get("/")
+async def root():
+  scraper = arxivscraper.Scraper(category='physics:cond-mat', date_from='2023-04-27',date_until='2023-05-07')
+  output = scraper.scrape()
+  return output

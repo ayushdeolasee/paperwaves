@@ -4,11 +4,12 @@ import arxiv
 app = Flask(__name__)
 
 @app.route("/")
-async def index():
+def index():
     search = arxiv.Search(
     query = "quantum",
     max_results = 10,
     sort_by = arxiv.SortCriterion.SubmittedDate)
+
     print(type(search))
     # print(len(search))
     for result in search.results():
@@ -26,4 +27,4 @@ async def index():
         document['Authors'] = str(result.authors[0])
         document['Primary_category'] = str(result.primary_category)
         # print(document) 
-        return document
+    return document
