@@ -26,14 +26,21 @@ let published = "";
 let subject = "";
 var datetime = new Date();
 var date;
-console.log(information);
-// title = information["Title"];
+// const id = "";
+
+// id = information["Entry_id"];
+// console.log(information["Authors"][0]);
+
+title = information["Title"];
 // author = information["Authors"];
-// published = information["Published"];
-// subject = information["Primary_category"];
-// datetime = new Date(published);
-// date = datetime.toDateString();
-// date = date.replace(" ", ", ");
+const authorArray = information["Authors"];
+author = authorArray.join(", ");
+// createAuthorString();
+published = information["Published"];
+subject = information["Primary_category"];
+datetime = new Date(published);
+date = datetime.toDateString();
+date = date.replace(" ", ", ");
 </script>
 
 <style scoped>

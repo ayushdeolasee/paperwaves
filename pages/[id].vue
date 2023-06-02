@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h1 class="title">
-            New Insights on the Stokes Paradox for Flow in Unbounded Domain
+            {{ title }}
         </h1>
         <p>
             <span class="keyWords">Authors:</span> Ingeborg G. Gjerde, Ridgway
@@ -29,35 +29,32 @@
             instability, meaning that flow instability steadily increases with
             domain size. We refer to this as an instability paradox.
         </p>
-        <NuxtLink :to="pdf"
-            ><button class="button">Read Now</button>
-        </NuxtLink>
+        <NuxtLink><button class="button">Read Now</button> </NuxtLink>
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            pdf: "",
-        };
-    },
-    mounted() {
-        fetch("http://127.0.0.1:8000")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then((data) => {
-                this.pdf = data["PDF_URL"];
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
-    },
-};
+<script setup>
+const { id } = useRoute().params;
+const url = "http://localhost:8000/info/";
+const newUrl = url.concat(id);
+console.log(newUrl);
+const title = "";
+
+await fetch(newUrl)
+    .then((response) => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then((data) => {
+        // console.log(data["Title"]);
+        title = data["Title"];
+    })
+    .catch((error) => {
+        console.error("Error", error);
+    });
+console.log("Title: ", title);
 </script>
 
 <style scoped>

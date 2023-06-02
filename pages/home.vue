@@ -5,25 +5,12 @@
             <input class="input" v-model="message" placeholder="Search" />
         </div>
         <div v-for="i in finalData" class="cards">
-            <!-- <card
-                :title="title"
-                :author="author"
-                :published="date"
-                :subject="subject"
-            /> -->
-            <card :information="finalData[i]" />
+            <card :information="i" />
         </div>
     </div>
 </template>
 
 <script setup>
-let title = "";
-let summary = "";
-let author = "";
-let published = "";
-let subject = "";
-var datetime = new Date();
-var date;
 let finalData;
 
 await fetch("http://127.0.0.1:8000")
@@ -35,23 +22,6 @@ await fetch("http://127.0.0.1:8000")
     })
     .then((data) => {
         finalData = data;
-        while (True) {
-            if (i == lenght(data)) {
-                break;
-            }
-        }
-        console.log(data);
-        title = data["Title"];
-        summary = data["Summary"];
-        author = data["Authors"];
-        published = data["Published"];
-        subject = data["Primary_category"];
-        // console.log(published);
-        datetime = new Date(published);
-        date = datetime.toDateString();
-        date = date.replace(" ", ", ");
-        // console.log(title);
-        // console.log(finalData);
     })
     .catch((error) => {
         console.error("Error:", error);
