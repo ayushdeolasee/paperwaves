@@ -11,5 +11,8 @@
   "devDependencies": {
     "@types/node": "^18",
     "nuxt": "^3.5.1"
+  },
+  "dependencies": {
+    "vue-mathjax": "^0.1.1"
   }
 }

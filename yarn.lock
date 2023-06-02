@@ -212,6 +212,11 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
+"@babel/parser@^7.18.4":
+  version "7.22.4"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.22.4.tgz#a770e98fd785c231af9d93f6459d36770993fb32"
+  integrity sha512-VLLsx06XkEYqBtE5YGPwfSGwfrjnyPP5oiGty3S8pQLFDFLaS8VwWSIxkTXpcvr5zeYLE6+MBNl2npl/YnfofA==
+
 "@babel/parser@^7.20.15", "@babel/parser@^7.21.3", "@babel/parser@^7.21.5", "@babel/parser@^7.21.8", "@babel/parser@^7.21.9":
   version "7.21.9"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.21.9.tgz#ab18ea3b85b4bc33ba98a8d4c2032c557d23cf14"
@@ -844,6 +849,15 @@
     "@vue/compiler-core" "3.3.4"
     "@vue/shared" "3.3.4"
 
+"@vue/compiler-sfc@2.7.14":
+  version "2.7.14"
+  resolved "https://registry.yarnpkg.com/@vue/compiler-sfc/-/compiler-sfc-2.7.14.tgz#3446fd2fbb670d709277fc3ffa88efc5e10284fd"
+  integrity sha512-aNmNHyLPsw+sVvlQFQ2/8sjNuLtK54TC6cuKnVzAY93ks4ZBrvwQSnkkIh7bsbNhum5hJBS00wSDipQ937f5DA==
+  dependencies:
+    "@babel/parser" "^7.18.4"
+    postcss "^8.4.14"
+    source-map "^0.6.1"
+
 "@vue/compiler-sfc@3.3.4", "@vue/compiler-sfc@^3.3.4":
   version "3.3.4"
   resolved "https://registry.yarnpkg.com/@vue/compiler-sfc/-/compiler-sfc-3.3.4.tgz#b19d942c71938893535b46226d602720593001df"
@@ -1400,6 +1414,11 @@ cookie-es@^1.0.0:
   resolved "https://registry.yarnpkg.com/cookie-es/-/cookie-es-1.0.0.tgz#4759684af168dfc54365b2c2dda0a8d7ee1e4865"
   integrity sha512-mWYvfOLrfEc996hlKcdABeIiPHUPC6DM2QYZdGGOvhOTbA3tjm2eBwqlJpoFdjC89NI4Qt6h0Pu06Mp+1Pj5OQ==
 
+core-js@^3.6.5:
+  version "3.30.2"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.30.2.tgz#6528abfda65e5ad728143ea23f7a14f0dcf503fc"
+  integrity sha512-uBJiDmwqsbJCWHAwjrx3cvjbMXP7xD72Dmsn5LOJpiRmE3WbBbN5rCqQ2Qh6Ek6/eOrjlWngEynBWo4VxerQhg==
+
 core-util-is@~1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.3.tgz#a6042d3634c2b27e9328f837b965fac83808db85"
@@ -1529,7 +1548,7 @@ csso@^5.0.5:
   dependencies:
     css-tree "~2.2.0"
 
-csstype@^3.1.1:
+csstype@^3.1.0, csstype@^3.1.1:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.1.2.tgz#1d4bf9d572f11c14031f0436e1c10bc1f571f50b"
   integrity sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ==
@@ -3404,6 +3423,15 @@ postcss@^8.1.10, postcss@^8.4.23:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
+postcss@^8.4.14:
+  version "8.4.24"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.24.tgz#f714dba9b2284be3cc07dbd2fc57ee4dc972d2df"
+  integrity sha512-M0RzbcI0sO/XJNucsGjvWU9ERWxb/ytp1w6dKtxTKgixdtQDq4rmx/g8W1hnaheq9jgwL/oyEdH5Bc4WwJKMqg==
+  dependencies:
+    nanoid "^3.3.6"
+    picocolors "^1.0.0"
+    source-map-js "^1.0.2"
+
 pretty-bytes@^6.1.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/pretty-bytes/-/pretty-bytes-6.1.0.tgz#1d1cc9aae1939012c74180b679da6684616bf804"
@@ -3728,7 +3756,7 @@ source-map-support@^0.5.21, source-map-support@~0.5.20:
     buffer-from "^1.0.0"
     source-map "^0.6.0"
 
-source-map@^0.6.0:
+source-map@^0.6.0, source-map@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
@@ -4200,12 +4228,28 @@ vue-devtools-stub@^0.1.0:
   resolved "https://registry.yarnpkg.com/vue-devtools-stub/-/vue-devtools-stub-0.1.0.tgz#a65b9485edecd4273cedcb8102c739b83add2c81"
   integrity sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==
 
+vue-mathjax@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/vue-mathjax/-/vue-mathjax-0.1.1.tgz#146c71d581ad099a224241c47f8df48cc924c128"
+  integrity sha512-bg5PpGPEB42mp+154khmqO1gtq6a/N8TbbLMVCOmaPV37vH96o7mjoAQ3jeQLQw3WMEHGz5zoDzvbcxhDkQKRQ==
+  dependencies:
+    core-js "^3.6.5"
+    vue "^2.6.11"
+
 vue-router@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-4.2.1.tgz#f8ab85c89e74682cad71519480fdf2b855e8c9e0"
   integrity sha512-nW28EeifEp8Abc5AfmAShy5ZKGsGzjcnZ3L1yc2DYUo+MqbBClrRP9yda3dIekM4I50/KnEwo1wkBLf7kHH5Cw==
   dependencies:
     "@vue/devtools-api" "^6.5.0"
+
+vue@^2.6.11:
+  version "2.7.14"
+  resolved "https://registry.yarnpkg.com/vue/-/vue-2.7.14.tgz#3743dcd248fd3a34d421ae456b864a0246bafb17"
+  integrity sha512-b2qkFyOM0kwqWFuQmgd4o+uHGU7T+2z3T+WQp8UBjADfEv2n4FEMffzBmCKNP0IGzOEEfYjvtcC62xaSKeQDrQ==
+  dependencies:
+    "@vue/compiler-sfc" "2.7.14"
+    csstype "^3.1.0"
 
 vue@^3.3.4:
   version "3.3.4"

@@ -1,15 +1,17 @@
 <template>
-    <div class="card">
-        <h1 class="cardTitle">
-            {{ title }}
-        </h1>
-        <p>
-            <span class="keyWords">Authors:</span>
-            {{ author }}
-        </p>
-        <p><span class="keyWords">Subject: </span>{{ subject }}</p>
-        <p><span class="keyWords">Published:</span> {{ published }}</p>
-    </div>
+    <NuxtLink class="card" :to="id">
+        <div>
+            <h1 class="cardTitle">
+                {{ title }}
+            </h1>
+            <p>
+                <span class="keyWords">Authors:</span>
+                {{ author }}
+            </p>
+            <p><span class="keyWords">Subject: </span>{{ subject }}</p>
+            <p><span class="keyWords">Published:</span> {{ published }}</p>
+        </div>
+    </NuxtLink>
 </template>
 
 <script setup>
@@ -26,11 +28,17 @@ let published = "";
 let subject = "";
 var datetime = new Date();
 var date;
+let id = "";
+let url = "";
 // const id = "";
 
 // id = information["Entry_id"];
 // console.log(information["Authors"][0]);
-
+id = information["Entry_id"];
+id = id.replace("http://arxiv.org/abs", "");
+console.log(id);
+// url = url.concat("http://localhost:3000/", id);
+// console.log(url);
 title = information["Title"];
 // author = information["Authors"];
 const authorArray = information["Authors"];
@@ -47,10 +55,13 @@ date = date.replace(" ", ", ");
 .cardTitle {
     line-height: 40px;
     font-size: 25px;
+    pointer-events: none;
 }
 .card {
     background-color: #defdfb;
     width: 100%;
+    text-decoration: none;
+    color: black;
     /* padding-left: 20px; */
     /* padding-right: 20px; */
     /* padding-top: 2px; */
