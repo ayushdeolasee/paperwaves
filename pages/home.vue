@@ -11,21 +11,33 @@
 </template>
 
 <script setup>
-let finalData;
+import { ref, watch } from "vue";
 
-await fetch("http://127.0.0.1:8000")
-    .then((response) => {
+const message = ref("");
+const finalData = ref([]);
+
+const fetchData = async (q = "") => {
+    let url = "http://127.0.0.1:8000";
+    if (q) {
+        const encoded = encodeURIComponent(q);
+        url = `http://127.0.0.1:8000/search?query=${encoded}`;
+    }
+    try {
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        return response.json();
-    })
-    .then((data) => {
-        finalData = data;
-    })
-    .catch((error) => {
+        finalData.value = await response.json();
+    } catch (error) {
         console.error("Error:", error);
-    });
+    }
+};
+
+await fetchData();
+
+watch(message, (val) => {
+    fetchData(val);
+});
 </script>
 
 <style scoped>
