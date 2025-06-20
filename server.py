@@ -58,11 +58,13 @@ async def info(paper_id: str):
 
 @app.get("/search")
 async def search(query: str = Query("", alias="query"), author: str = Query("", alias="author"), max_results: int = 50):
-    """Search papers by query or author name."""
+    """Search papers by keyword and/or author name."""
+    search_terms = []
+    if query:
+        search_terms.append(query)
     if author:
-        search_query = f'au:"{author}"'
-    else:
-        search_query = query
+        search_terms.append(f'au:"{author}"')
+    search_query = " AND ".join(search_terms) if search_terms else "all"
     search = arxiv.Search(
         query=search_query,
         max_results=max_results,
