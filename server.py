@@ -1,7 +1,11 @@
 import arxiv
-import json 
+import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import aiosqlite
+import asyncio
+from fastapi import BackgroundTasks
+from datetime import datetime, timedelta
 
 app = FastAPI()
 
@@ -20,72 +24,92 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+DB_PATH = 'articles_cache.db'
+REFRESH_INTERVAL = 60 * 90  # 1.5 hours in seconds
+
+async def init_db():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute('''
+            CREATE TABLE IF NOT EXISTS articles (
+                entry_id TEXT PRIMARY KEY,
+                title TEXT,
+                summary TEXT,
+                pdf_url TEXT,
+                published TEXT,
+                authors TEXT,
+                primary_category TEXT,
+                updated_at TEXT
+            )
+        ''')
+        await db.commit()
+
+async def cache_articles():
+    search = arxiv.Search(
+        query="quantum",
+        max_results=50,
+        sort_by=arxiv.SortCriterion.SubmittedDate
+    )
+    async with aiosqlite.connect(DB_PATH) as db:
+        for result in search.results():
+            authors = [str(a) for a in result.authors]
+            await db.execute('''
+                INSERT OR REPLACE INTO articles (entry_id, title, summary, pdf_url, published, authors, primary_category, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                str(result.entry_id),
+                str(result.title),
+                str(result.summary).replace("\n", " "),
+                str(result.pdf_url),
+                str(result.published),
+                json.dumps(authors),
+                str(result.primary_category),
+                datetime.utcnow().isoformat()
+            ))
+        await db.commit()
+
+async def refresh_cache_periodically():
+    while True:
+        await cache_articles()
+        await asyncio.sleep(REFRESH_INTERVAL)
+
+@app.on_event("startup")
+async def on_startup():
+    await init_db()
+    asyncio.create_task(refresh_cache_periodically())
 
 @app.get("/")
 async def root():
-    search = arxiv.Search(
-    query = "quantum",
-    max_results = 50,
-    sort_by = arxiv.SortCriterion.SubmittedDate)
-    finalDocument = []
-    for result in search.results():
-        authors = []
-        document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
-#       document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Primary_category": ""}
-        summary = str(result.summary)
-        summary2 = summary.replace("\n", " ")
-        document['Title'] = str(result.title)
-        # document['Summary'] = str(result.summary)
-        document['Summary'] = summary2
-        document['Entry_id'] = str(result.entry_id)
-        document['PDF_URL'] = str(result.pdf_url)
-        document['Published'] = str(result.published)
-        i = 0
-        while True:
-            if i == len(result.authors):
-                break
-            authors.append(str(result.authors[i]))
-            i += 1
-            
-        document['Authors'] = authors
-        # document['Authors'] = str(result.authors[0])
-        document['Primary_category'] = str(result.primary_category)
-        # print(document)
-#       print(str(result.authors))
-        json_document = json.dumps(document)
-        # print(document)
-        finalDocument.append(document)
-        # print(document) 
-    return finalDocument 
-
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute('SELECT entry_id, title, summary, pdf_url, published, authors, primary_category FROM articles ORDER BY published DESC LIMIT 50')
+        rows = await cursor.fetchall()
+        finalDocument = []
+        for row in rows:
+            document = {
+                'Entry_id': row[0],
+                'Title': row[1],
+                'Summary': row[2],
+                'PDF_URL': row[3],
+                'Published': row[4],
+                'Authors': json.loads(row[5]),
+                'Primary_category': row[6]
+            }
+            finalDocument.append(document)
+        return finalDocument
 
 @app.get("/info/{id}")
 async def info(id: str):
-    search = arxiv.Search(
-        id_list=[id]
-    ) 
-    print(id)
-    for result in search.results():
-        authors = []
-        document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
-#       document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Primary_category": ""}
-        summary = str(result.summary)
-        summary2 = summary.replace("\n", " ")
-        document['Title'] = str(result.title)
-        # document['Summary'] = str(result.summary)
-        document['Summary'] = summary2
-        document['Entry_id'] = str(result.entry_id)
-        document['PDF_URL'] = str(result.pdf_url)
-        document['Published'] = str(result.published)
-        i = 0
-        while True:
-            if i == len(result.authors):
-                break
-            authors.append(str(result.authors[i]))
-            i += 1
-            
-        document['Authors'] = authors
-        # document['Authors'] = str(result.authors[0])
-        document['Primary_category'] = str(result.primary_category)
-        print(document)
-        return document 
+    async with aiosqlite.connect(DB_PATH) as db:
+        cursor = await db.execute('SELECT entry_id, title, summary, pdf_url, published, authors, primary_category FROM articles WHERE entry_id = ?', (id,))
+        row = await cursor.fetchone()
+        if row:
+            document = {
+                'Entry_id': row[0],
+                'Title': row[1],
+                'Summary': row[2],
+                'PDF_URL': row[3],
+                'Published': row[4],
+                'Authors': json.loads(row[5]),
+                'Primary_category': row[6]
+            }
+            return document
+        return {"error": "Article not found"} 
