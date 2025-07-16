@@ -2,10 +2,18 @@ import arxiv
 import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import aiosqlite
 import asyncio
 from fastapi import BackgroundTasks
 from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+from supabase import create_client, Client
+
+load_dotenv()
+SUPABASE_URL = os.getenv('SUPABASE_URL')
+SUPABASE_KEY = os.getenv('SUPABASE_SERVICE_ROLE')
+
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = FastAPI()
 
@@ -24,24 +32,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_PATH = 'articles_cache.db'
 REFRESH_INTERVAL = 60 * 90  # 1.5 hours in seconds
 
-async def init_db():
-    async with aiosqlite.connect(DB_PATH) as db:
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS articles (
-                entry_id TEXT PRIMARY KEY,
-                title TEXT,
-                summary TEXT,
-                pdf_url TEXT,
-                published TEXT,
-                authors TEXT,
-                primary_category TEXT,
-                updated_at TEXT
-            )
-        ''')
-        await db.commit()
+async def ensure_articles_table():
+    # Supabase is schemaless via API, so ensure table exists via SQL RPC
+    # This will only work if the table does not exist
+    create_table_sql = '''
+    create table if not exists articles (
+        entry_id text primary key,
+        title text,
+        summary text,
+        pdf_url text,
+        published text,
+        authors text,
+        primary_category text,
+        updated_at text
+    );
+    '''
+    try:
+        supabase.rpc("execute_sql", {"sql": create_table_sql}).execute()
+    except Exception as e:
+        pass  # Table may already exist or function not available
 
 async def cache_articles():
     search = arxiv.Search(
@@ -49,23 +60,20 @@ async def cache_articles():
         max_results=50,
         sort_by=arxiv.SortCriterion.SubmittedDate
     )
-    async with aiosqlite.connect(DB_PATH) as db:
-        for result in search.results():
-            authors = [str(a) for a in result.authors]
-            await db.execute('''
-                INSERT OR REPLACE INTO articles (entry_id, title, summary, pdf_url, published, authors, primary_category, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (
-                str(result.entry_id),
-                str(result.title),
-                str(result.summary).replace("\n", " "),
-                str(result.pdf_url),
-                str(result.published),
-                json.dumps(authors),
-                str(result.primary_category),
-                datetime.utcnow().isoformat()
-            ))
-        await db.commit()
+    for result in search.results():
+        authors = [str(a) for a in result.authors]
+        data = {
+            "entry_id": str(result.entry_id),
+            "title": str(result.title),
+            "summary": str(result.summary).replace("\n", " "),
+            "pdf_url": str(result.pdf_url),
+            "published": str(result.published),
+            "authors": json.dumps(authors),
+            "primary_category": str(result.primary_category),
+            "updated_at": datetime.utcnow().isoformat()
+        }
+        # Upsert (insert or update)
+        supabase.table("articles").upsert(data).execute()
 
 async def refresh_cache_periodically():
     while True:
@@ -74,42 +82,46 @@ async def refresh_cache_periodically():
 
 @app.on_event("startup")
 async def on_startup():
-    await init_db()
+    await ensure_articles_table()
     asyncio.create_task(refresh_cache_periodically())
 
 @app.get("/")
 async def root():
-    async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute('SELECT entry_id, title, summary, pdf_url, published, authors, primary_category FROM articles ORDER BY published DESC LIMIT 50')
-        rows = await cursor.fetchall()
-        finalDocument = []
-        for row in rows:
-            document = {
-                'Entry_id': row[0],
-                'Title': row[1],
-                'Summary': row[2],
-                'PDF_URL': row[3],
-                'Published': row[4],
-                'Authors': json.loads(row[5]),
-                'Primary_category': row[6]
-            }
-            finalDocument.append(document)
-        return finalDocument
+    # Fetch latest 50 articles ordered by published desc
+    response = supabase.table("articles").select(
+        "entry_id, title, summary, pdf_url, published, authors, primary_category"
+    ).order("published", desc=True).limit(50).execute()
+    rows = response.data if hasattr(response, 'data') else response["data"]
+    finalDocument = []
+    for row in rows:
+        document = {
+            'Entry_id': row['entry_id'],
+            'Title': row['title'],
+            'Summary': row['summary'],
+            'PDF_URL': row['pdf_url'],
+            'Published': row['published'],
+            'Authors': json.loads(row['authors']),
+            'Primary_category': row['primary_category']
+        }
+        finalDocument.append(document)
+    return finalDocument
 
 @app.get("/info/{id}")
 async def info(id: str):
-    async with aiosqlite.connect(DB_PATH) as db:
-        cursor = await db.execute('SELECT entry_id, title, summary, pdf_url, published, authors, primary_category FROM articles WHERE entry_id = ?', (id,))
-        row = await cursor.fetchone()
-        if row:
-            document = {
-                'Entry_id': row[0],
-                'Title': row[1],
-                'Summary': row[2],
-                'PDF_URL': row[3],
-                'Published': row[4],
-                'Authors': json.loads(row[5]),
-                'Primary_category': row[6]
-            }
-            return document
-        return {"error": "Article not found"} 
+    response = supabase.table("articles").select(
+        "entry_id, title, summary, pdf_url, published, authors, primary_category"
+    ).eq("entry_id", id).limit(1).execute()
+    rows = response.data if hasattr(response, 'data') else response["data"]
+    if rows:
+        row = rows[0]
+        document = {
+            'Entry_id': row['entry_id'],
+            'Title': row['title'],
+            'Summary': row['summary'],
+            'PDF_URL': row['pdf_url'],
+            'Published': row['published'],
+            'Authors': json.loads(row['authors']),
+            'Primary_category': row['primary_category']
+        }
+        return document
+    return {"error": "Article not found"} 
