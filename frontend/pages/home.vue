@@ -2,30 +2,40 @@
     <div class="parent">
         <div class="searchBar">
             <img class="icon" src="/find.svg" />
-            <input class="input" v-model="message" placeholder="Search" />
+            <input class="input" v-model="message" @keydown.enter="handleSearch" placeholder="Search (hit enter to search)" />
         </div>
-        <div v-for="i in finalData" class="cards">
+        <div v-for="i in finalData" :key="i.Entry_id" class="cards">
             <card :information="i" />
         </div>
     </div>
 </template>
 
 <script setup>
-let finalData;
+import { ref } from 'vue';
 
-await fetch("http://127.0.0.1:8000")
-    .then((response) => {
+const finalData = ref([]);
+const message = ref('');
+
+const fetchData = async (query = '') => {
+    const endpoint = query ? `search/${query}` : '';
+    const url = `http://127.0.0.1:8000/${endpoint}`;
+    try {
+        const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        return response.json();
-    })
-    .then((data) => {
-        finalData = data;
-    })
-    .catch((error) => {
-        console.error("Error:", error);
-    });
+        finalData.value = await response.json();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+};
+
+const handleSearch = () => {
+    fetchData(message.value);
+};
+
+// Initial data fetch
+fetchData();
 </script>
 
 <style scoped>

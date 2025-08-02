@@ -23,40 +23,32 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
+    return await search_articles("machine learning")
+
+
+
+
+@app.get("/search/{query}")
+async def search_articles(query: str):
     search = arxiv.Search(
-    query = "quantum",
-    max_results = 50,
-    sort_by = arxiv.SortCriterion.SubmittedDate)
-    finalDocument = []
+        query=query,
+        max_results=50,
+        sort_by=arxiv.SortCriterion.SubmittedDate
+    )
+    final_document = []
     for result in search.results():
-        authors = []
-        document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Published": "", "Authors": [], "Primary_category": ""}
-#       document = {'Title': "", 'Summary': "", "Entry_id": '', "PDF_URL": "", "Primary_category": ""}
-        summary = str(result.summary)
-        summary2 = summary.replace("\n", " ")
-        document['Title'] = str(result.title)
-        # document['Summary'] = str(result.summary)
-        document['Summary'] = summary2
-        document['Entry_id'] = str(result.entry_id)
-        document['PDF_URL'] = str(result.pdf_url)
-        document['Published'] = str(result.published)
-        i = 0
-        while True:
-            if i == len(result.authors):
-                break
-            authors.append(str(result.authors[i]))
-            i += 1
-            
-        document['Authors'] = authors
-        # document['Authors'] = str(result.authors[0])
-        document['Primary_category'] = str(result.primary_category)
-        # print(document)
-#       print(str(result.authors))
-        json_document = json.dumps(document)
-        # print(document)
-        finalDocument.append(document)
-        # print(document) 
-    return finalDocument 
+        summary = str(result.summary).replace("\n", " ")
+        document = {
+            'Title': str(result.title),
+            'Summary': summary,
+            'Entry_id': str(result.entry_id),
+            'PDF_URL': str(result.pdf_url),
+            'Published': str(result.published),
+            'Authors': [str(author) for author in result.authors],
+            'Primary_category': str(result.primary_category)
+        }
+        final_document.append(document)
+    return final_document 
 
 
 
