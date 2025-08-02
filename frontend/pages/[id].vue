@@ -1,97 +1,97 @@
+
 <template>
     <div class="container">
-        <h1 class="title">
-            {{ title }}
-        </h1>
-        <p><span class="keyWords">Authors:</span> {{ author }}</p>
-        <p><span class="keyWords">Subject:</span> {{ subject }}</p>
-        <p><span class="keyWords">Published:</span> {{ date }}</p>
-        <vue-mathjax :formula="summary" class="description">
-            <!-- {{ summary }} -->
-        </vue-mathjax>
-        <NuxtLink :to="pdfURL"
-            ><button class="button">Read Now</button>
-        </NuxtLink>
+        <div class="backButton" @click="goBack">
+            <img src="/back.svg" alt="Back" />
+        </div>
+        <h1 class="title">{{ title }}</h1>
+        <p class="meta"><span class="keyWords">Authors:</span> {{ author }}</p>
+        <p class="meta"><span class="keyWords">Subject:</span> {{ subject }}</p>
+        <p class="meta"><span class="keyWords">Published:</span> {{ published }}</p>
+        <p class="summary"><span class="keyWords">Summary:</span> {{ summary }}</p>
     </div>
 </template>
 
 <script setup>
-import { VueMathjax } from "vue-mathjax";
+import { useRoute } from 'vue-router';
 
-const { id } = useRoute().params;
-const url = "http://localhost:8000/info/";
-const newUrl = url.concat(id);
-let pdfURL = "";
-console.log(newUrl);
+const route = useRoute();
+const id = route.params.id;
+
 let title = "";
 let author = "";
-let summary = "";
+let published = "";
 let subject = "";
-var datetime = new Date();
-var date;
+let summary = "";
 
-await fetch(newUrl)
-    .then((response) => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then((data) => {
-        // console.log(data["Title"]);
-        title = data["Title"];
-        const authorArray = data["Authors"];
-        author = authorArray.join(", ");
-        console.log(author);
-        summary = data["Summary"];
-        date = datetime.toDateString();
-        date = date.replace(" ", ", ");
-        subject = data["Primary_category"];
-        pdfURL = data["PDF_URL"];
-    })
-    .catch((error) => {
-        console.error("Error", error);
-    });
-console.log("Title: ", title);
+const { data: information, error } = await useFetch(`http://127.0.0.1:8000/${id}`);
+
+if (error.value) {
+    console.error("Error fetching data:", error.value);
+}
+
+if (information.value) {
+    const info = information.value;
+    title = info.Title;
+    author = info.Authors.join(', ');
+    published = new Date(info.Published).toDateString();
+    subject = info.Primary_category;
+    summary = info.Summary;
+}
+
+const goBack = () => {
+    window.history.back();
+};
 </script>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap");
-.button {
-    outline: none;
-    border: none;
-    background: #20b2ab;
-    color: white;
-    width: 20rem;
-    height: 5rem;
-    border-radius: 17px;
-    font-size: 19px;
-    margin-top: 7rem;
-}
-.button:hover {
-    cursor: pointer;
-}
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+
 .container {
-    text-align: center;
-    padding: 10px;
+    font-family: "Poppins", sans-serif;
+    padding: 40px;
+    width: 100%;
+    box-sizing: border-box;
 }
+
+.title {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.meta {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
 .keyWords {
     color: #006993;
+    font-weight: 600;
 }
-p {
-    font-family: "Poppins";
-    font-weight: 250;
-    padding-left: 10px;
-    padding-right: 10px;
+
+.summary {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-top: 30px;
 }
-.title {
-    font-family: "Poppins";
-    text-align: center;
-    font-size: 30px;
-    font-weight: 800;
+
+.backButton {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
 }
-.description {
-    margin-top: 3rem;
+
+.backButton img {
+    width: 24px;
+    height: 24px;
 }
 </style>
