@@ -4,16 +4,22 @@
         <div class="backButton" @click="goBack">
             <img src="/back.svg" alt="Back" />
         </div>
-        <h1 class="title">{{ title }}</h1>
-        <p class="meta"><span class="keyWords">Authors:</span> {{ author }}</p>
-        <p class="meta"><span class="keyWords">Subject:</span> {{ subject }}</p>
-        <p class="meta"><span class="keyWords">Published:</span> {{ published }}</p>
-        <p class="summary"><span class="keyWords">Summary:</span> {{ summary }}</p>
+        <h1 class="title">
+            <LatexRenderer :content="title" />
+        </h1>
+        <p class="meta"><span class="keyWords">Authors: </span> {{ author }}</p>
+        <p class="meta"><span class="keyWords">Subject: </span> {{ subject }}</p>
+        <p class="meta"><span class="keyWords">Published: </span> {{ published }}</p>
+        <div class="summary">
+            <span class="keyWords">Summary: </span>
+            <LatexRenderer :content="summary" />
+        </div>
     </div>
 </template>
 
 <script setup>
 import { useRoute } from 'vue-router';
+import LatexRenderer from '../components/LatexRenderer.vue';
 
 const route = useRoute();
 const id = route.params.id;

@@ -1,8 +1,9 @@
+
 <template>
     <NuxtLink class="card" :to="id">
         <div>
             <h1 class="cardTitle">
-                {{ title }}
+                <LatexRenderer :content="title" />
             </h1>
             <p>
                 <span class="keyWords">Authors:</span>
@@ -15,6 +16,8 @@
 </template>
 
 <script setup>
+import LatexRenderer from './LatexRenderer.vue';
+
 // const { title, author, published, subject } = defineProps([
 //     "title",
 //     "author",
@@ -35,7 +38,7 @@ let url = "";
 // id = information["Entry_id"];
 // console.log(information["Authors"][0]);
 id = information["Entry_id"];
-id = id.replace("http://arxiv.org/abs", "");
+id = id.replace("http://arxiv.org/abs/", "");
 console.log(id);
 // url = url.concat("http://localhost:3000/", id);
 // console.log(url);
@@ -50,6 +53,7 @@ datetime = new Date(published);
 date = datetime.toDateString();
 date = date.replace(" ", ", ");
 </script>
+
 
 <style scoped>
 .cardTitle {
