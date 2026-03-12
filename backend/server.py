@@ -25,9 +25,6 @@ app.add_middleware(
 async def root():
     return await search_articles("machine learning")
 
-
-
-
 @app.get("/search/{query}")
 async def search_articles(query: str):
     search = arxiv.Search(
@@ -50,9 +47,6 @@ async def search_articles(query: str):
         final_document.append(document)
     return final_document 
 
-
-
-
 @app.get("/{article_id}")
 async def info(article_id: str):
     print(f"Searching for article with ID: {article_id}")
@@ -69,7 +63,5 @@ async def info(article_id: str):
         'Authors': [str(author) for author in result.authors],
         'Primary_category': str(result.primary_category)
     }
-
     return document
 
- 
